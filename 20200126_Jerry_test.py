@@ -11,6 +11,10 @@ print(n.head())
 
 print(e.head())
 
+n.to_csv("nodes.csv")
+
+e.to_csv("e.csv")
+
 #ox.plot_graph(G, fig_height=10, fig_width=10, edge_color="black")
 
 # print(np.random.choice(G.nodes))
