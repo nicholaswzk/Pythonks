@@ -4,8 +4,8 @@ class PriorityQ:
     def __init__(self):
         self.data = []
 
-    def push(self, uID ,curNode, dis, p):
-        heapq.heappush(self.data, (uID, curNode, dis, p))
+    def push(self, f, uID ,curNode, dis, p):
+        heapq.heappush(self.data, (uID, f, curNode, dis, p))
 
     def pop(self):
         return heapq.heappop(self.data)

@@ -2,12 +2,16 @@ import numpy as np
 import osmnx as ox
 import networkx as nx
 import MyQueue
+import itertools as it
+import math
 
 #matplotlib inline
 
 #! -------------------------------------- Defaults -----------------------------------
 old_market = (1.4052, 103.9024)
 G = ox.graph_from_point(old_market, distance=300, truncate_by_edge=True)# quick plot
+def heuristic(curnode, endnode):
+   return math.sqrt((G.nodes[endnode].get('x') - G.nodes[curnode].get('x')) ** 2 + (G.nodes[endnode].get('y') - G.nodes[curnode].get('y')) ** 2)
 #! -------------------------------------- Defaults -----------------------------------
 
 #! --------------------------------------- GET Random destination and source ---------------------------------------
@@ -27,7 +31,7 @@ pq = MyQueue.PriorityQ()
 #! Source is the starting node
 #! Distance for starting will be zero
 #! Parent, starting does not have any parent thus None is placed
-pq.push(next(c), 4598672210, 0, None)
+pq.push(0, next(c), 4598672210, 0, None)
 
 #! Used nodes or nodes that have been stepped thru
 used = {}
@@ -35,7 +39,7 @@ used = {}
 #! Starting of A* Algo
 while pq.getSize() > 0:
     #! Get the Priority obj within the priority Q. Priority by Distance
-    _, curN, dis, p = pq.pop()
+    _, __, curN, dis, p = pq.pop()
     #! When path is found. Below is static, if dynamic can put curN == endN
     if curN == 4004983342:
         #! Building the path, end node will be appended first, then slowly search for the parent from the used dict -
@@ -70,7 +74,8 @@ while pq.getSize() > 0:
             continue
         #! 'length' can be any numeric data in etc
         ndis = dis + etc.get('length', 1)
-        pq.push(next(c), nei, ndis, curN)
+        f = heuristic(nei,4004983342) + ndis
+        pq.push(f, next(c), nei, ndis, curN)
 #TODO -------------------------- Working A* Algo --------------------------
 
 
