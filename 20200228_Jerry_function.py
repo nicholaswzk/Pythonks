@@ -69,4 +69,8 @@ def astar(startN, endN):
             pq.push(f,next(c), nei, ndis, curN)
     return -1
 
-print(astar(4598672210,4004983342))
+s = astar(4598672210,4004983342)
+
+kk = ox.node_list_to_coordinate_lines(G, s)
+
+print(kk)
