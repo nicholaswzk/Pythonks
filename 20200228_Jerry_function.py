@@ -6,11 +6,21 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import MyQueue
 import itertools as it
+import geopandas as gpd
 
 #matplotlib inline
 
 old_market = (1.4052585, 103.9023302)
-G = ox.graph_from_point(old_market, distance=300, truncate_by_edge=True)# quick plot
+
+box = (1.4220, 1.3863, 103.9259, 103.8895)
+
+G = ox.create_poi_gdf("map.geojson")
+
+#G = ox.graph_from_file("map")
+
+#G = ox.graph_from_bbox(1.42103880000, 1.39289490000, 103.92311100000, 103.89616010000, simplify=True, retain_all=False)# quick plot
+
+#G = ox.graph_from_point(old_market, distance=2500, truncate_by_edge=True)# quick plot
 
 def heuristic(curnode, endnode):
    return math.sqrt((G.nodes[endnode].get('x') - G.nodes[curnode].get('x')) ** 2 + (G.nodes[endnode].get('y') - G.nodes[curnode].get('y')) ** 2)
@@ -23,7 +33,7 @@ def astar(startN, endN):
     #! Source is the starting node
     #! Distance for starting will be zero
     #! Parent, starting does not have any parent thus None is placed
-    pq.push(0, next(c), startN, 0, None)
+    pq.push(0, next(c), startN, 0.0, None)
 
     #! Used nodes or nodes that have been stepped thru
     used = {}
@@ -44,7 +54,7 @@ def astar(startN, endN):
                 finalpath.append(n)
                 n = used[n]
             finalpath = finalpath[::-1]
-            return finalpath
+            return (finalpath, dis)
         #! to make it efficient and prevent endless loop, if the current Node is found within used nodes, -
         #! it will just skip to the next Queue object
         if curN in used:
@@ -64,13 +74,34 @@ def astar(startN, endN):
             if nei in used:
                 continue
             #! 'length' can be any numeric data in etc
-            ndis = dis + etc.get('length', 1)
+            ndis = dis + etc[0].get("length")
             f = heuristic(nei,endN) + ndis
             pq.push(f,next(c), nei, ndis, curN)
     return -1
 
-s = astar(4598672210,4004983342)
 
-kk = ox.node_list_to_coordinate_lines(G, s)
+n, e = ox.graph_to_gdfs(G)
 
-print(kk)
+print(n.head())
+
+print(e.head())
+
+n.to_csv("nodes.csv")
+
+e.to_csv("e.csv")
+
+# countries_gdf = gpd.read_file("punggol.geojson")
+
+#countries_gdf.to_csv("test.csv")
+
+# test1xy = (1.404062, 103.904901)
+
+# test2xy = (1.393783, 103.91052)
+
+# t1 = ox.get_nearest_node(G, test1xy)
+
+# t2 = ox.get_nearest_node(G, test2xy)
+
+# print(astar(t1,t2))
+
+
