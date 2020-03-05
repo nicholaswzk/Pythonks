@@ -428,6 +428,8 @@ def astar(startN, endN):
 # new_edges.to_csv("e1.csv")
 #new_nodes, new_edges = connect_poi(pois, nodes, edges, key_col='key', path=None)
 
+# kk = ox.node_list_to_coordinate_lines(G, s)
+
 
 #ox.plot_graph(G, fig_height=10, fig_width=10, edge_color="black")
 

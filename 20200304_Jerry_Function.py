@@ -53,6 +53,8 @@ def astar(G, startN, endN):
         #? etc (dict) e.g
         #? {'osmid': 35091912, 'oneway': True, 'lanes': '2', 'name': 'Punggol Place', 'highway': 'residential', 'maxspeed': '40', 'length': 25.879} 1
         #! ndis is new distance
+        #print(G[curN].items())
+        #print("----------------------------------------------------------------------------")
         for nei, etc in G[curN].items():
             # TODO print(nei, etc)
             # TODO print(curN, nei)
@@ -76,6 +78,12 @@ punggol = (1.4052585, 103.9023302)
 
 G = ox.graph_from_point(punggol, distance=2500, truncate_by_edge=True)# quick plot
 
+# n, e = ox.graph_to_gdfs(G)
+
+# n.to_csv("node.csv")
+
+# e.to_csv("edge.csv")
+
 # ox.plot_graph(G, fig_height=10, fig_width=10, edge_color="black")
 
 test1xy = (1.404062, 103.904901)
@@ -88,7 +96,9 @@ t2 = ox.get_nearest_node(G, test2xy)
 
 s = astar(G, t1,t2)
 
+print(s)
+
 kk = ox.node_list_to_coordinate_lines(G, s)
 
-print(kk)
+#print(kk)
 #! ---------------------------Testing---------------------------
