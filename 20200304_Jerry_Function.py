@@ -39,7 +39,7 @@ def astar(G, startN, endN):
                 finalpath.append(n)
                 n = used[n]
             finalpath = finalpath[::-1]
-            return (finalpath, dis)
+            return finalpath
         #! to make it efficient and prevent endless loop, if the current Node is found within used nodes, -
         #! it will just skip to the next Queue object
         if curN in used:
@@ -86,5 +86,9 @@ t1 = ox.get_nearest_node(G, test1xy)
 
 t2 = ox.get_nearest_node(G, test2xy)
 
-print(astar(G, t1,t2))
+s = astar(G, t1,t2)
+
+kk = ox.node_list_to_coordinate_lines(G, s)
+
+print(kk)
 #! ---------------------------Testing---------------------------
