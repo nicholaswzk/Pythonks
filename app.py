@@ -1,34 +1,40 @@
-from flask import Flask, render_template
-import folium
+from flask import Flask, render_template, request, jsonify
+from aStar import testRouteAstar
 import osmnx as ox
 import networkx as nx
 
-app = Flask(__name__)
 
+app = Flask(__name__)
+punggol = (1.4052585, 103.9023302)
+G = ox.graph_from_point(punggol, distance=2500, truncate_by_edge=True, network_type="walk")# quick plot
+
+# @app.route('/route_name', methods=['GET', 'POST'])
 @app.route('/')
 def index():
     punggol = (1.3984, 103.9072)
-    G = ox.graph_from_point(punggol, distance=2000)
-    mrt = ox.geocode('Punggol, Punggol Central, Punggol, Northeast, 828868, Singapore')
-    hdb = ox.geocode('Waterway Sunray, 659B, Punggol East, Punggol, Northeast, 822659, Singapore')
-
-    # Get nearest node from geocode
-    mrt_node = ox.get_nearest_node(G,mrt,method='euclidean',return_dist=False)
-    hdb_node = ox.get_nearest_node(G,hdb,method='euclidean',return_dist=False)
-
-    # Set shortest_path route
-    route = nx.shortest_path(G, mrt_node, hdb_node)
-
-    # Generate Folium Map at Punggol area
-    folium_map = folium.Map(width='80%',height='100%',location=punggol,tiles='cartodbpositron',zoom_start=14)
-    
-    # Set route on existing folium map
-    m = ox.plot.plot_route_folium(G, route, route_map=folium_map,route_color='green')
-    # Add Markers to folium map
-    folium.Marker(location=mrt,icon=folium.Icon(color='red')).add_to(folium_map)
-    folium.Marker(location=hdb,icon=folium.Icon(color='blue')).add_to(folium_map)
-    folium_map.save('templates/map.html')
+    error = None
     return render_template('index.html')
+
+
+@app.route('/posted', methods=['POST'])
+def posted():
+    start = request.form['start']
+    end = request.form['end']
+    
+    print('start = ', start)
+    print('end =', end)
+
+    # Split form value and convert to tuple of float
+    start_coord = (float(start.split(",")[0]),float(start.split(",")[1]))
+    end_coord = (float(end.split(",")[0]),float(end.split(",")[1]))
+
+    # Call aStar function --> return array
+    arr = testRouteAstar(start_coord,end_coord,G);
+    
+    if start and end:
+        return jsonify({'start': start_coord,'end': end_coord,'array':arr})
+        
+    return jsonify({'error' : 'Missing data!'})
 
 if __name__ == '__main__':
     app.run(debug=True)

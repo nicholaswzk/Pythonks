@@ -1,10 +1,60 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="{{url_for('static',filename='css/main.css')}}" />
+    <link rel="stylesheet" href="{{url_for('static',filename='leaflet/leaflet.css')}}">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script type="text/javascript" src="{{ url_for('static', filename='leaflet/leaflet.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.4.1.js') }}"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://kit.fontawesome.com/67a1ea4d81.js" crossorigin="anonymous"></script>
+</head>
 
-{% block head %} {{ super() }} {% endblock %}
-
-
-{% block body %}
-<h1>Test folium</h1>
-{% include "map.html" %}
-{% endblock %}
+<body>
+    <div id="map"></div>
+    <nav class="nav">
+        <ul class="navbar-nav">
+            <li class="nav-icon-group">
+                <label id="mrt" class="opt">
+                    <input type="radio" id="mrt_rb" class="hide" name="mode" value="mrt">
+                    <i class="fas fa-subway"></i>
+                </label>
+                <label id="bus" class="opt">
+                    <input type="radio" id="bus_rb" class="hide" name="mode" value="bus">
+                    <i class="fas fa-bus-alt"></i>
+                </label>
+                <label id="shelter" class="opt">
+                    <input type="radio" id="shelter_rb" class="hide" name="mode" value="shelter">
+                    <i class="fas fa-umbrella"></i>
+                </label>
+                <label id="walk" class="opt active">
+                    <input type="radio" id="walk_rb" class="" name="mode" value="walk" checked>
+                    <i class="fas fa-walking"></i>
+                </label>
+            </li>
+            <li class="nav-input-group">
+            <form id="form" class="form" action="{{ url_for('posted') }}" method="post">
+                <div class="input-container">
+                    <i class="fas fa-map-marker-alt icon"></i>
+                    <input class="textbox" spellcheck="false" type="text" name="from" id="start" placeholder="Start" required>
+                </div>
+                <div class="input-container">
+                    <i class="fas fa-flag-checkered icon"></i>
+                    <input class="textbox" spellcheck="false" type="text" name="end" id="end" placeholder="End" required>
+                </div>
+                <div class="btn-container">
+                    <button class="submit" type="submit">Go<i class="fas fa-spinner fa-pulse loader"></i></button>
+                </div>
+            </form>
+            </li>
+        </ul>
+    </nav>
+    <script type="text/javascript" src="{{ url_for('static', filename='map.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
