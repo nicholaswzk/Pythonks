@@ -104,6 +104,29 @@ body {
 	width: 100%;
 	margin-bottom: 1rem;
 }
+.response-container {
+    display: flex;
+    padding: 0.5rem;
+    width: 100%;
+    margin: 1rem 0;
+    vertical-align: middle;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 5px;
+    background-color: var(--bg--secondary);
+    visibility: hidden;
+}
+.response{
+	padding: 1rem;
+    font-size: 0.9rem;
+    vertical-align: middle;
+    color: khaki;
+    overflow-wrap: break-word;
+    height: inherit;
+}
+.response-container.show{
+	visibility: visible;
+}
 .icon {
 	color: var(--accent--blue);
 	width: 20%;
@@ -175,5 +198,12 @@ body {
 	background-color: var(--bg--secondary);
 	word-break: break-all !important;
 	overflow-x: hidden !important;
+}
+/* .awesome-marker i {
+	font-size: 12px;
+	margin-top: 8px;
+} */
+.awesome-marker > .fa-circle {
+	margin-top: 10px;
 }
 

@@ -4,25 +4,24 @@ var eObj = {};
 var addr = [];
 var mrts = [
 	{ label: "Coral Edge LRT", lat: 1.3939318, lon: 103.9125723 },
-	{ label: "Cove LRT", lat: 1.3994643, lon: 103.9058522 },
+	{ label: "Cove LRT", lat: 1.3994603, lon: 103.9058059 },
 	{ label: "Damai LRT", lat: 1.4052523, lon: 103.9085982 },
 	{ label: "Kadaloor LRT", lat: 1.399601, lon: 103.9164448 },
-	{ label: "Meridian LRT", lat: 1.39635375, lon: 103.9075887 }, // recheck coords 
-	{ label: "Nibong LRT", lat: 1.4118314, lon: 103.9003049 },
-	{ label: "Oasis LRT", lat: 1.4023166, lon: 103.9126843 },
+	{ label: "Meridian LRT", lat: 1.3969357, lon: 103.9088889 },
+	{ label: "Nibong LRT", lat: 1.4118877, lon: 103.9003304 },
+	{ label: "Oasis LRT", lat: 1.4022823, lon: 103.9127329 },
 	{ label: "Punggol MRT", lat: 1.4052551, lon: 103.9023538 },
 	{ label: "Punggol Point LRT", lat: 1.4168814, lon: 103.9066298 },
-	{ label: "Riviera LRT", lat: 1.3945492, lon: 103.9161044 },
-	{ label: "Sam Kee LRT", lat: 1.4097219, lon: 103.9048903 },
+	{ label: "Riviera LRT", lat: 1.394538, lon: 103.9161538 },
+	{ label: "Sam Kee LRT", lat: 1.4097076, lon: 103.904874 },
 	{ label: "Samudera LRT", lat: 1.4159537, lon: 103.9021398 },
 	{ label: "Soo Teck LRT", lat: 1.4053014, lon: 103.8972748 },
-	{ label: "Sumang LRT", lat: 1.4085322, lon: 103.8985342 },
-	{ label: "Teck Lee LRT", lat: 1.4127373, lon: 103.9065808 }
+	{ label: "Sumang LRT", lat: 1.4085322, lon: 103.8985342 }
 ];
 var awidth = $("#start").innerWidth();
 var $end = $("#end");
 var $start = $("#start");
-var labels = ["mrt", "bus", "shelter", "walk"];
+var labels = ["mrt", "bus", "walk"];
 
 // typing timer
 $.fn.donetyping = function(callback) {
@@ -77,6 +76,11 @@ function doAutocomplete($input) {
 function showLoad() {
 	$(".submit").addClass("run");
 	$(".loader").addClass("run");
+}
+
+function removeLoad(){
+	$(".submit").removeClass("run");
+	$(".loader").removeClass("run");
 }
 
 // Call LocationIQ API
@@ -142,6 +146,7 @@ $(document).ready(function() {
 	$("form").on("submit", function(event) {
 		console.log(sObj.lat + "," + sObj.lon);
 		console.log(eObj.lat + "," + eObj.lon);
+		console.log("flag:" + $('input[name="mode"]:checked').val());
 		if (
 			$("#start").val() != "" &&
 			$("#end").val() != "" &&
@@ -150,24 +155,26 @@ $(document).ready(function() {
 		) {
 			console.log("Missing input");
 		} else {
+			$(".response-container").removeClass("show");
 			showLoad();
 			$.ajax({
 				data: {
 					start: sObj.lat + "," + sObj.lon,
-					end: eObj.lat + "," + eObj.lon
-					//$('input[name="mode"]:checked').val(); // Send flag
+					end: eObj.lat + "," + eObj.lon,
+					mode: $('input[name="mode"]:checked').val() // Send flag
 				},
 				type: "POST",
 				url: "/posted"
 			}).done(function(data) {
 				// do after sending data
 				if (data.error) {
+					$(".response").text(data.error);
+					$(".response-container").addClass("show");
 					console.log(data.error);
+					removeLoad();
 				} else {
-					//testDrawMarker(data.start,data.end);
-					console.log("From flask: Start = " + data.start);
-					console.log("From flask: End = " + data.end);
-					drawRoute(data.array);
+					console.log(data.array);
+					drawRoute(data.mode, data.array);
 				}
 			});
 		}

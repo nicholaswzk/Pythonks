@@ -8,6 +8,8 @@ import math
 
 #! ---------------------------Functions---------------------------
 
+
+
 def heuristic(G, curnode, endnode):
    return math.sqrt((G.nodes[endnode].get('x') - G.nodes[curnode].get('x')) ** 2 + (G.nodes[endnode].get('y') - G.nodes[curnode].get('y')) ** 2)
 
@@ -95,7 +97,7 @@ def astar(G, startN, endN):
 #! ---------------------------Testing---------------------------s
 
 #! ---------------------------Zen Testing---------------------------
-def testRouteAstar(start_tuple,end_tuple,G):
+def routeAstar(start_tuple,end_tuple,G):
 
     # OSMNX nearest NODE COORDS
     start = ox.get_nearest_node(G, start_tuple);
@@ -105,14 +107,14 @@ def testRouteAstar(start_tuple,end_tuple,G):
     s = astar(G, start,end);
     coords = ox.node_list_to_coordinate_lines(G, s);
 
-    output = [];
+    # output = [];
     #   print(coords)
     # Convert into 2d array of lat,lon
-    for x in range(len(coords)): # Parent Array
-        for i in range(len(coords[x])): # Inner Array
-            output.append([coords[x][i][1],coords[x][i][0]]);
+    # for x in range(len(coords)): # Parent Array
+    #     for i in range(len(coords[x])): # Inner Array
+    #         output.append([coords[x][i][1],coords[x][i][0]]);
 
-    return output;
+    return coords;
 #! ---------------------------Zen Testing---------------------------
 
 
