@@ -199,11 +199,3 @@ body {
 	word-break: break-all !important;
 	overflow-x: hidden !important;
 }
-/* .awesome-marker i {
-	font-size: 12px;
-	margin-top: 8px;
-} */
-.awesome-marker > .fa-circle {
-	margin-top: 10px;
-}
-

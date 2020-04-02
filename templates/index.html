@@ -13,8 +13,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.4.1.js') }}"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://kit.fontawesome.com/67a1ea4d81.js" crossorigin="anonymous"></script>
-    <script src='https://api.mapbox.com/mapbox.js/v3.3.0/mapbox.js'></script>
-    <link href='https://api.mapbox.com/mapbox.js/v3.3.0/mapbox.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -22,15 +20,15 @@
     <nav class="nav">
         <ul class="navbar-nav">
             <li class="nav-icon-group">
-                <label id="mrt" class="opt">
+                <label id="mrt" class="opt" title="MRT">
                     <input type="radio" id="mrt_rb" class="hide" name="mode" value="mrt">
                     <i class="fas fa-subway"></i>
                 </label>
-                <label id="bus" class="opt">
+                <label id="bus" class="opt" title="Bus">
                     <input type="radio" id="bus_rb" class="hide" name="mode" value="bus">
                     <i class="fas fa-bus-alt"></i>
                 </label>
-                <label id="walk" class="opt active">
+                <label id="walk" class="opt active" title="Walk">
                     <input type="radio" id="walk_rb" class="hide" name="mode" value="walk" checked>
                     <i class="fas fa-walking"></i>
                 </label>

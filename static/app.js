@@ -24,10 +24,10 @@ var $start = $("#start");
 var labels = ["mrt", "bus", "walk"];
 
 // typing timer
-$.fn.donetyping = function(callback) {
+$.fn.donetyping = function (callback) {
 	var _this = $(this);
 	var x_timer;
-	_this.keyup(function() {
+	_this.keyup(function () {
 		clearTimeout(x_timer);
 		x_timer = setTimeout(clear_timer, 300);
 	});
@@ -39,7 +39,7 @@ $.fn.donetyping = function(callback) {
 };
 
 function doAutocomplete($input) {
-	// If user searching endpoint, call API
+	// If user searching endpoint, call APIAPI
 	if ($input.is("#end")) {
 		geocode($input);
 	}
@@ -50,7 +50,7 @@ function doAutocomplete($input) {
 		$input.autocomplete({
 			delay: 0,
 			source: mrts,
-			select: function(event, ui) {
+			select: function (event, ui) {
 				if ($input.is("#start")) {
 					sObj = ui.item;
 				}
@@ -59,11 +59,11 @@ function doAutocomplete($input) {
 	} else if ($input.is("#end")) {
 		$input.autocomplete({
 			delay: 0,
-			source: function(request, resolve) {
+			source: function (request, resolve) {
 				// fetch new values with request.term
 				resolve(addr.slice(0, 7));
 			},
-			select: function(event, ui) {
+			select: function (event, ui) {
 				if ($input.is("#end")) {
 					eObj = ui.item;
 				}
@@ -78,7 +78,7 @@ function showLoad() {
 	$(".loader").addClass("run");
 }
 
-function removeLoad(){
+function removeLoad() {
 	$(".submit").removeClass("run");
 	$(".loader").removeClass("run");
 }
@@ -99,7 +99,7 @@ function geocode($input) {
 		},
 		method: "GET"
 	};
-	$.ajax(settings).done(function(response) {
+	$.ajax(settings).done(function (response) {
 		for (var i = 0; i < response.length; i++) {
 			if (response[i].display_name.indexOf("Punggol") > -1) {
 				// Filter to Punggol only
@@ -113,9 +113,10 @@ function geocode($input) {
 		}
 	});
 }
-$(document).ready(function() {
+
+$(document).ready(function () {
 	// Radiobutton behaviour
-	$("input[name='mode']").change(function(e) {
+	$("input[name='mode']").change(function (e) {
 		var rid = $(this).attr("id");
 		if (rid.length > -1) {
 			cur = rid.substring(0, rid.length - 3);
@@ -134,16 +135,16 @@ $(document).ready(function() {
 		}
 	});
 
-	$start.donetyping(function(callback) {
+	$start.donetyping(function (callback) {
 		doAutocomplete($start);
 	});
 
-	$end.donetyping(function(callback) {
+	$end.donetyping(function (callback) {
 		doAutocomplete($end);
 	});
 
 	// Send form data to backend via ajax
-	$("form").on("submit", function(event) {
+	$("form").on("submit", function (event) {
 		console.log(sObj.lat + "," + sObj.lon);
 		console.log(eObj.lat + "," + eObj.lon);
 		console.log("flag:" + $('input[name="mode"]:checked').val());
@@ -165,7 +166,7 @@ $(document).ready(function() {
 				},
 				type: "POST",
 				url: "/posted"
-			}).done(function(data) {
+			}).done(function (data) {
 				// do after sending data
 				if (data.error) {
 					$(".response").text(data.error);
