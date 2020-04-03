@@ -1,4 +1,3 @@
-import numpy as np
 import osmnx as ox
 import itertools as it
 import MyQueue
@@ -63,11 +62,11 @@ def astar(G, startN, endN):
 def routeAstar(start_tuple,end_tuple,G):
 
     # OSMNX nearest NODE COORDS
-    start = ox.get_nearest_node(G, start_tuple);
-    end = ox.get_nearest_node(G, end_tuple);
+    start = ox.get_nearest_node(G, start_tuple)
+    end = ox.get_nearest_node(G, end_tuple)
 
     # DO ASTAR
-    s = astar(G, start,end);
-    coords = ox.node_list_to_coordinate_lines(G, s);
+    s = astar(G, start,end)
+    coords = ox.node_list_to_coordinate_lines(G, s)
 
-    return coords;
+    return coords
