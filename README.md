@@ -6,7 +6,7 @@ Home@Punggol
 Youtube Link
 -----
 
-[Team 3 - Lab Group 04] (https://youtu.be/cngSOIWU8lc)
+[Team 3 - Lab Group 04](https://youtu.be/cngSOIWU8lc)
 
 ---
 
