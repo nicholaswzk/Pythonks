@@ -1,5 +1,4 @@
 import ast as st
-
 import numpy as np
 import osmnx as ox
 import networkx as nx
@@ -10,7 +9,6 @@ import overpy
 from collections import Iterable
 from shapely.geometry import Point, LineString
 from ast import literal_eval as make_tuple
-import pprint
 
 def flatten(lis):
     for item in lis:
@@ -127,6 +125,7 @@ def create_graph(response_jsons, name='unnamed', retain_all=True, bidirectional=
 
     return G
 
+#Getting the dict of the bus in the dataset of xml
 def findingbuses(bus,busnumber):
     root = bus.getroot()
     busrelationstuff[busnumber] = []
@@ -135,8 +134,9 @@ def findingbuses(bus,busnumber):
         for subelem in elem:
             busrelationstuff[busnumber].append(subelem.attrib)
 
-
-
+#most of the for loops are to access the data in a sequeue order which results in long running time.
+#this is the dataset of the bus in the osm.
+#i pulled it out because the nodes are needed. This is to have accurate bus routes of the bus numbers.
 query_str = '[out:json][timeout:180];(relation["type"="route"]["route"="bus"](1.385700,103.887300,1.422000,103.925900);>;);out;'
 response_json = ox.overpass_request(data={'data': query_str}, timeout=180)
 bus={
@@ -162,6 +162,7 @@ bus={
 #those with towards punngol and coming in punngol are one way direction.
 import xml.etree.ElementTree as ET
 busrelationstuff={}
+
 bus3=ET.parse('Bus\\bus3towardspunggol.xml')
 findingbuses(bus3,"bus3")
 
@@ -173,283 +174,271 @@ findingbuses(bus43,"bus43")
 
 bus50 = ET.parse('Bus\\bus50towardspunggol.xml')
 findingbuses(bus50,"bus50")
-# bus50 = bus50 = ET.parse('Bus\\bus50outofpunggol.xml')
-# findingbuses(bus50,"bus50")
+
 bus82 = ET.parse('Bus\\bus82.xml')
 findingbuses(bus82,"bus82")
 bus83= ET.parse('Bus\\bus83.xml')
 findingbuses(bus83,"bus83")
-#bus84= ET.parse('bus84.xml')
-#findingbuses(bus84,"bus84")//checked and data is corrupted in the openstreetmap ( only way to northen of  punggol)
+
 bus85= ET.parse('Bus\\bus85towardspunggol.xml')
 findingbuses(bus85,"bus85")
+
 bus117=ET.parse('Bus\\bus117towardspunggol.xml')
 findingbuses(bus117,"bus117")
+
 bus119=ET.parse('Bus\\bus119.xml')
 findingbuses(bus119,"bus119")
+
 bus136=ET.parse('Bus\\bus136towardspunggol.xml')
 findingbuses(bus136,"bus136")
+
 bus381 = ET.parse('Bus\\bus381.xml')
 findingbuses(bus381,"bus381")
+
 bus382G= ET.parse('Bus\\bus382G.xml')
 findingbuses(bus382G,"bus382G")
+
 bus382W= ET.parse('Bus\\bus382W.xml')
 findingbuses(bus382W,"bus382W")
+
 bus386 = ET.parse('Bus\\bus386.xml')
 findingbuses(bus386,"bus386")
 
 
 
 
-#print(busrelationstuff)
+
+
 G = create_graph(response_json, name='unnamed')
 
 
-#startingnode =3865151068
-#3865151068
-#4928930141
-#2110621964
-
-#nodes to play with 4928930141(starting bus 381) starting only have
-#endingnode = 3905787877
-#3316956195
-#1847853709
-#nodes to play with3316956195 ending only haved
-
-
+#this is to get the start and ending node of the bus stops.
 def Busroute(startingnode,endingnode):
- startingdummynode=startingnode
- endingdummynode=endingnode
- for i in range(0, len(G.nodes())):
-    if (list(G.nodes())[i]) == startingdummynode:
-        startingdummynode = list(G.nodes())[i]
+     startingdummynode=startingnode
+     endingdummynode=endingnode
+     for i in range(0, len(G.nodes())):
+          if (list(G.nodes())[i]) == startingdummynode:
+              startingdummynode = list(G.nodes())[i]
 
- startingbusstopcord=startingdummynode
- nearestnodes = ox.geo_utils.get_nearest_edge(G, (G.nodes[startingdummynode]['y'], (G.nodes[startingdummynode]['x'])))
- nearestnodes = nearestnodes[2]
+    #this is to get the 2 nodes nearest road to the starting bus stop
+     startingbusstopcord=startingdummynode
+     nearestnodes = ox.geo_utils.get_nearest_edge(G, (G.nodes[startingdummynode]['y'], (G.nodes[startingdummynode]['x'])))
+     nearestnodes = nearestnodes[2]
 
- endingbusstopcord=endingdummynode
- endingnearestnodes = ox.geo_utils.get_nearest_edge(G, (G.nodes[endingdummynode]['y'], (G.nodes[endingdummynode]['x'])))
- endingnearestnodes=endingnearestnodes[2]
-
-
-
- busrelation=[]
- relation=[]
- starting= False
- endingrelation=[]
- busendingrelation=[]
- for key,values in bus.items():
-  for secondkey,secondvalues in values.items():
-      for thirdvalues in secondvalues.get("nodes"):
-        if nearestnodes == thirdvalues:
-            if secondkey not in relation:
-              relation.append(secondkey)
-            if key not in busrelation:
-             busrelation.append(key)
-        if endingnearestnodes == thirdvalues:
-            if secondkey not in endingrelation :
-             endingrelation.append(secondkey)
-            if key not in busendingrelation:
-             busendingrelation.append(key)
-
-#  print("busrouterelationisthis",relation) ##NODES
-#  print("relationishere", busrelation)
-#  print("endingrelationishere", endingrelation)
-#  print("endingrelationishere", busendingrelation)
- busroute={}
- changingbusroute={}
- startingbusroute={}
- starting=False
- midwaychange=False
- endingreached=False
- directbus=False
- for key,values in busrelationstuff.items():
-  busroute[key] = []
-  startingbusroute[key]=[]
-  changingbusroute[key] = []
-  starting=False
-  for secondkey in values:
-      if key in busrelation and key in busendingrelation: ##direct bus
-         directbus=True
-         if int(secondkey["ref"])in relation: ##find the start of the relationship route
-             starting=True
-         if int(secondkey["ref"]) in endingrelation: #find the end of the relationship route
-             starting=False
-         if (starting):
-             busroute[key].append(int(secondkey["ref"]))
-      elif key in busrelation: #find the starting bus
-          if int(secondkey["ref"]) in relation:  ##find the start of the relationship route #bus stop is including in this whole thing.
-              starting = True
-          if (starting):
-              startingbusroute[key].append(int(secondkey["ref"])) ## find the starting route (bus stop is including in this whole thing)
-      elif key in busendingrelation:
-           changingbusroute[key].append(int(secondkey["ref"])) ##find the whole route including bus stops of the changing bus
-
-
- if(directbus):
-  smallest=99999999999;
-  busnumber="";
-  for key in busroute:
-   if(len(busroute[key]) != 0): #get the bus with the shortest route
-    if(smallest > len(busroute[key])):
-     smallest = len(busroute[key])
-     busnumber=key
-
-  busnumber=str(busnumber)
-  listofnodesforbusroute=[]
-  for i in endingrelation: #relation might have more than 2.
-   busroute[busnumber].append(i)
-
-#   print(busroute)
-  for i in busroute[busnumber]:
-    for key,values in bus.items():
-        for secondkey,secondvalues in values.items():
-            if secondkey == i:
-                if secondvalues["nodes"] not in listofnodesforbusroute:
-                 listofnodesforbusroute.append(secondvalues["nodes"])
-
-
-  listofnodesforbusroute = list(flatten(listofnodesforbusroute))
-
-  listofpoints=[]
-  listoflinestring=[]
-  for i in listofnodesforbusroute:
-    listofpoints.append((G.nodes[i]['y'],G.nodes[i]['x']))
-
-  
-  Everythingthatisneeded=[]
-  threebusstops=[]
-  threebusstops.append((G.nodes[startingbusstopcord]['y'],G.nodes[startingbusstopcord]['x']))
-  threebusstops.append((G.nodes[endingbusstopcord]['y'],G.nodes[endingbusstopcord]['x']))
-  Everythingthatisneeded.append("BUS")
-  Everythingthatisneeded.append(listofpoints)
-  Everythingthatisneeded.append(threebusstops)
-  Everythingthatisneeded.append(busnumber)
-  return Everythingthatisneeded
+    #this is to get the 2 nodes nearest road to the ending bus stop
+     endingbusstopcord=endingdummynode
+     endingnearestnodes = ox.geo_utils.get_nearest_edge(G, (G.nodes[endingdummynode]['y'], (G.nodes[endingdummynode]['x'])))
+     endingnearestnodes=endingnearestnodes[2]
 
 
 
+     busrelation=[]
+     relation=[]
+     starting= False
+     endingrelation=[]
+     busendingrelation=[]
+     #to check the bus data that is in the osm.
+     for key,values in bus.items(): #<- to check each and every bus services.
+        for secondkey,secondvalues in values.items(): #to pull out the waysID.
+            for thirdvalues in secondvalues.get("nodes"): #to pull out the nodes to see which nodes is related to the starting or ending.
+                if nearestnodes == thirdvalues: #check nearest road node  near the bus stop.
+                    if secondkey not in relation:
+                        relation.append(secondkey)#append the waysID so that the edges which is u and v are connected properly.
+                    if key not in busrelation:
+                        busrelation.append(key)#to know which bus has the wayID to that place.
+                if endingnearestnodes == thirdvalues:
+                    if secondkey not in endingrelation :
+                        endingrelation.append(secondkey)
+                    if key not in busendingrelation:
+                        busendingrelation.append(key)
 
-##end of direct bus
+     busroute={}
+     changingbusroute={}
+     startingbusroute={}
+     starting=False
+     midwaychange=False
+     endingreached=False
+     directbus=False
 
+     #to check in my XML files as the routes of the buses are in sequeence
+     for key,values in busrelationstuff.items():
+          busroute[key] = []
+          startingbusroute[key]=[]
+          changingbusroute[key] = []
+          starting=False
+          for secondkey in values:
+              if key in busrelation and key in busendingrelation: ##direct bus
+                 directbus=True
+                 if int(secondkey["ref"])in relation: ##find the start of the relationship route
+                     starting=True
+                 if int(secondkey["ref"]) in endingrelation: #find the end of the relationship route
+                     starting=False
+                 if (starting):
+                     busroute[key].append(int(secondkey["ref"]))
+              elif key in busrelation: #find the starting bus
+                  if int(secondkey["ref"]) in relation:  ##find the start of the relationship route #bus stop is including in this whole thing.
+                      starting = True
+                  if (starting):
+                      startingbusroute[key].append(int(secondkey["ref"])) ## find the starting route (bus stop is including in this whole thing)
+              elif key in busendingrelation:
+                   changingbusroute[key].append(int(secondkey["ref"])) ##find the whole route including bus stops of the changing bus
 
+    #if there is a bus from starting point to ending point
+     if(directbus):
+          smallest=99999999999
+          busnumber=""
+          for key in busroute:
+               if(len(busroute[key]) != 0): #get the bus with the shortest route
+                    if(smallest > len(busroute[key])):
+                         smallest = len(busroute[key])
+                         busnumber=key
 
-
-##start of changing bus
-
- if(not directbus):
-  busstoptochangeat = {}
-  bustotakefirst=0;
-  bustochangeto=0;
-  for findbus in busrelation:
-    busstoptochangeat[findbus]=[] ##to start the dict of the bus
-
-  found=False;
-  ## to find the starting bus and ending bus have the same bus stop
-  ##find the very first bus that is related to this bus bus stop
-  for buschange,busvalues in changingbusroute.items(): ## all values including bus stop and ways
-   for i in busvalues:
-    for findingoutbus in busrelation:
-       if findingoutbus in busrelationstuff: ##to prevent errors
-        for values in busrelationstuff.get(findingoutbus): ##get the original values of xml for that bus
-            if(int(values['ref']) == i and values['role'] == 'stop'): ## check if any of the bus stop is related to the changing bus busstop
-                if(not found):
-                 busstoptochangeat[findingoutbus].append(i)
-                 bustotakefirst=findingoutbus
-                 found=True##can have multiple buses to change here but i give up, because at bus interchange u can techinally also can change bus to get there.
-
-  midpointchange=0;
-  for findingoutbus in busrelation:
-    if findingoutbus in busstoptochangeat:
-        for values in busstoptochangeat.get(findingoutbus):
-            midpointchange=values
-
-  midpointchangecords=midpointchange
-  midpointchange = ox.geo_utils.get_nearest_edge(G, (G.nodes[midpointchange]['y'], (G.nodes[midpointchange]['x'])))
-  midpointchange=midpointchange[1]
-
-
-
-  fullchangingbusroute=[]
-  timetochange=False
-  ##need to do in for(IMPORTANT) IF(something in something) < this will messed up the routes because all the values are in order.
-  ##get the first half of the routes
-  for waysvalues in startingbusroute.get(bustotakefirst):
-    for key, values in bus.items():
-        for secondkey, secondvalues in values.items():
-            if secondkey == waysvalues:
-              for i in  secondvalues["nodes"]:
-                if i != midpointchange:
-                 if(not timetochange):
-                   if i not in fullchangingbusroute:
-                    fullchangingbusroute.append(i)
-                else:
-                  timetochange = True
-
-
-  endingroute=False;
-  start2ndhalf=False;
-  ##need to do in for(IMPORTANT) IF(something in something) < this will messed up the routes because all the values are in order.
-  for endingbus,endingvalues in changingbusroute.items(): ##check what bus is available at the ending
-   for ivalues in endingvalues: # check the ways in the routes
-    for key, values in bus.items(): #grab all the relation ways from the orginal data
-        for secondkey, secondvalues in values.items(): #check the nodes in the way of the orginal data
-            if secondkey == ivalues: ##if the ref is = to the ending bus ref thats when you know the 2 bus meet.
-                for i in secondvalues["nodes"]: ##grab the nodes that is nearest to the bus stop
-                    if i == midpointchange: ##the first half is already appened so 2nd half shall start from where it ended.
-                        start2ndhalf=True
-                    if(start2ndhalf):
-                        if(not endingroute):
-                         if i not in fullchangingbusroute:
-                            # print("i have enter")
-                            # print(i)
-                            bustochangeto=key
-                            fullchangingbusroute.append(i)##append the nodes ! not the ways anymore
-                            if(i == endingnearestnodes):
-                               endingroute=True;
+          busnumber=str(busnumber)
+          listofnodesforbusroute=[]
+          for i in endingrelation: #relation might have more than 2.
+               busroute[busnumber].append(i)
 
 
+          for i in busroute[busnumber]: #to converts the waysID into nodes.
+                for key,values in bus.items():
+                    for secondkey,secondvalues in values.items():
+                        if secondkey == i:
+                            if secondvalues["nodes"] not in listofnodesforbusroute:
+                                listofnodesforbusroute.append(secondvalues["nodes"])
 
-  listoffullroutepoint=[]
-  listoffullroutelinestring=[]
-  listoffullroutewithtuple=[]
-  fulltuple=[]
-  count = 0
-  startcount=fullchangingbusroute.index(nearestnodes)
-  if(len(startingbusroute.get(bustotakefirst)) != 0 and len(changingbusroute.get(bustochangeto)) != 0): ##check if there is any data at all in the starting route
-   for i in fullchangingbusroute:
-      if count >= startcount:
-        listoffullroutepoint.append((G.nodes[i]['y'],G.nodes[i]['x']))
-        count=count+1
-      else:
-        count = count + 1
-  else:
-    pass
-#   if(len(startingbusroute.get(bustotakefirst)) != 0): ##check if there is any data at all in the starting route
-#    for i in fullchangingbusroute:
-#     listoffullroutepoint.append((G.nodes[i]['y'],G.nodes[i]['x']))
-#   else:
-#     pass
-#   for i in fullchangingbusroute:
-#     listoffullroutepoint.append((G.nodes[i]['y'],G.nodes[i]['x']))
+          #to turn it into a list
+          listofnodesforbusroute = list(flatten(listofnodesforbusroute))
+
+          listofpoints=[]
+          listoflinestring=[]
+          for i in listofnodesforbusroute:#to turn it into a LAT and LONG
+                listofpoints.append((G.nodes[i]['y'],G.nodes[i]['x']))
 
 
-  Everythingthatisneeded=[]
-  allbusesinformation=[]
-  allbusesinformation.append(bustotakefirst)
-  allbusesinformation.append(bustochangeto)
-  threebusstops=[]
-  threebusstops.append((G.nodes[startingbusstopcord]['y'],G.nodes[startingbusstopcord]['x']))
-  threebusstops.append((G.nodes[midpointchangecords]['y'],G.nodes[midpointchangecords]['x']))
-  threebusstops.append((G.nodes[endingbusstopcord]['y'],G.nodes[endingbusstopcord]['x']))
-  Everythingthatisneeded.append("BUS")
-  Everythingthatisneeded.append(listoffullroutepoint)
-  Everythingthatisneeded.append(threebusstops)
-  Everythingthatisneeded.append(allbusesinformation)
-  return Everythingthatisneeded
+          Everythingthatisneeded=[]
+          threebusstops=[]
+          threebusstops.append((G.nodes[startingbusstopcord]['y'],G.nodes[startingbusstopcord]['x']))
+          threebusstops.append((G.nodes[endingbusstopcord]['y'],G.nodes[endingbusstopcord]['x']))
+          Everythingthatisneeded.append("BUS")
+          Everythingthatisneeded.append(listofpoints) # this would be the LAT and LONG( the routes)
+          Everythingthatisneeded.append(threebusstops)#this would be the bus stops of the starting and ending
+          Everythingthatisneeded.append(busnumber)# this would be the bus number to take.
+          return Everythingthatisneeded
+
+    ##end of direct bus
+ 
+    ##start of changing bus
+
+     if(not directbus):
+          busstoptochangeat = {}
+          bustotakefirst=0
+          bustochangeto=0
+          for findbus in busrelation:
+                busstoptochangeat[findbus]=[] ##to start the dict of the bus
+
+          found=False
+          ## to find the starting bus and ending bus have the same bus stop
+          ##find the very first bus that is related to this bus bus stop
+          for buschange,busvalues in changingbusroute.items(): ## all values including bus stop and ways
+               for i in busvalues:
+                    for findingoutbus in busrelation:
+                       if findingoutbus in busrelationstuff: ##to prevent errors
+                        for values in busrelationstuff.get(findingoutbus): ##get the original values of xml for that bus
+                            if(int(values['ref']) == i and values['role'] == 'stop'): ## check if any of the bus stop is related to the changing bus busstop
+                                if(not found):
+                                     busstoptochangeat[findingoutbus].append(i)#get the bus number that is related
+                                     bustotakefirst=findingoutbus
+                                     found=True##can have multiple buses to change here but i will just take one changing bus in order not to run the program for too
+        #long as it will take a lot of time to keep on accessing the datas.
+
+        #to know if where to change at
+          midpointchange=0
+          for findingoutbus in busrelation:
+            if findingoutbus in busstoptochangeat:
+                for values in busstoptochangeat.get(findingoutbus):
+                    midpointchange=values #get the bus stop values out
+
+          midpointchangecords=midpointchange
+          midpointchange = ox.geo_utils.get_nearest_edge(G, (G.nodes[midpointchange]['y'], (G.nodes[midpointchange]['x'])))
+          midpointchange=midpointchange[1] # get the nearest road node to the midpoint bus stop
 
 
 
-#Busroute(2110621964,3316956195)
+          fullchangingbusroute=[]
+          timetochange=False
+          ##need to do in for(IMPORTANT)
+          #IF(something in something) < this will messed up the routes because all the values are in order.
+          ##get the first half of the routes
+          for waysvalues in startingbusroute.get(bustotakefirst):
+                for key, values in bus.items():
+                    for secondkey, secondvalues in values.items():
+                        if secondkey == waysvalues:
+                              for i in  secondvalues["nodes"]:
+                                    if i != midpointchange: #find out the road routes to the mid point bus stop
+                                         if(not timetochange):
+                                         #keep appending till you reach the midpoint as there is no need to continue after that because it's the next bus
+                                           if i not in fullchangingbusroute:
+                                            fullchangingbusroute.append(i)
+                                    else:
+                                      timetochange = True
+
+
+          endingroute=False
+          start2ndhalf=False
+          ##need to do in for(IMPORTANT)
+          # IF(something in something) < this will messed up the routes because all the values are in order.
+          for endingbus,endingvalues in changingbusroute.items(): ##check what bus is available at the ending
+               for ivalues in endingvalues: # check the ways in the routes
+                    for key, values in bus.items(): #grab all the relation ways from the orginal data
+                        for secondkey, secondvalues in values.items(): #check the nodes in the way of the orginal data
+                            if secondkey == ivalues: ##if the ref is = to the ending bus ref thats when you know the 2 bus meet.
+                                for i in secondvalues["nodes"]: ##grab the nodes that is nearest to the bus stop
+                                    if i == midpointchange: ##the first half is already appeneded so 2nd half shall start from where it ended.
+                                        start2ndhalf=True
+                                    if(start2ndhalf):
+                                        if(not endingroute):#in order to find the ending route node so we can stop appending.
+                                             if i not in fullchangingbusroute:
+                                                    bustochangeto=key
+                                                    fullchangingbusroute.append(i)##continue appending from the midpoint to the end.
+                                                    if(i == endingnearestnodes):
+                                                           endingroute=True
+
+
+
+          listoffullroutepoint=[]
+          listoffullroutelinestring=[]
+          listoffullroutewithtuple=[]
+          fulltuple=[]
+          count = 0
+          startcount=fullchangingbusroute.index(nearestnodes)
+          if(len(startingbusroute.get(bustotakefirst)) != 0 and len(changingbusroute.get(bustochangeto)) != 0):
+              ##check if there is any data at all in the starting route
+               for i in fullchangingbusroute:
+                      if count >= startcount:
+                          # this is to increase accuracy of the nodes. because i appended ways which the list of nodes which  the startingpoint could be 3rd in the list.
+                            listoffullroutepoint.append((G.nodes[i]['y'],G.nodes[i]['x']))
+                            count=count+1
+                      else:
+                            count = count + 1
+          else:
+            pass
+
+
+          Everythingthatisneeded=[]
+          allbusesinformation=[]
+          allbusesinformation.append(bustotakefirst) # know what bus to take first
+          allbusesinformation.append(bustochangeto) # know what bus to change to
+          threebusstops=[]
+          threebusstops.append((G.nodes[startingbusstopcord]['y'],G.nodes[startingbusstopcord]['x'])) #starting bus stop in LAT and LONG
+          threebusstops.append((G.nodes[midpointchangecords]['y'],G.nodes[midpointchangecords]['x'])) # mid point bus stop in LAT and LONG
+          threebusstops.append((G.nodes[endingbusstopcord]['y'],G.nodes[endingbusstopcord]['x'])) #ending bus stop in LAT and LONG
+          Everythingthatisneeded.append("BUS")
+          Everythingthatisneeded.append(listoffullroutepoint)  # all of the routes in LAT and LONG
+          Everythingthatisneeded.append(threebusstops)# all of the busstop in LAT and LONG
+          Everythingthatisneeded.append(allbusesinformation) # all of the bus services information
+          return Everythingthatisneeded
+
+
+#some examples to try out with.
+#print(Busroute(2110621964,3316956195))
 #Busroute(3865151068,1847853709)

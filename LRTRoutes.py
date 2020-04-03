@@ -75,6 +75,7 @@ def create_graph(response_jsons, name='unnamed', retain_all=True, bidirectional=
 
 
 def LRTSelector(G, EndN, Flag):
+    """To Select the nearest LRT station that is closest to the start point and end point"""
     # List of Station IDs
     StationsEast = [1840734592, 1840734597, 1840734578,
                     1840734604, 1840734594, 1840734599, 1840734593, 6587709456]
@@ -100,6 +101,9 @@ def LRTSelector(G, EndN, Flag):
 
 
 def LRTPathFinder(G, StartPt, EndStation):
+    """To path find the StartStation to the Endstation, this will return a path or array of node to node edge function.
+    In order for the Function to return the path, the path will find until the node is 50 metres from the endStation
+    This Function uses Breadth-First Search but of queue, it utilises 2 arrays as there is only 2 direction that LRT can go"""
     firstLoop = False
 
     StartNode = ox.get_nearest_edge(G, StartPt)
@@ -132,6 +136,7 @@ def LRTPathFinder(G, StartPt, EndStation):
 
 
 def getDirectDistance(G, Node1, Node2):
+    """This function is utilised to find the direct distance in KILOMETRES between 2 nodes"""
     R = 6373.0
     lat1 = math.radians(G.nodes[Node1]['y'])
     lon1 = math.radians(G.nodes[Node1]['x'])
@@ -146,6 +151,7 @@ def getDirectDistance(G, Node1, Node2):
 
 
 def getDistanceKM(start, end):
+    """This function is utilised to find the direct distance in Kilometres between 2 lat lng"""
     R = 6373.0
     lat1 = math.radians(start[0])
     lon1 = math.radians(start[1])
@@ -160,6 +166,7 @@ def getDistanceKM(start, end):
 
 
 def getClosestStation(G, Node, destination):
+    """This function returns the distance between 2 nodes in lat lng units"""
     lat1 = math.radians(G.nodes[Node]['y'])
     lon1 = math.radians(G.nodes[Node]['x'])
     dist = math.sqrt((G.nodes[Node]['x'] - destination[1])
@@ -168,8 +175,7 @@ def getClosestStation(G, Node, destination):
 
 
 def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
-    print("LRT START == ", StartLatLng)
-    print("LRT END == ", DestLatLng)
+    """The main function of LRT returns the array of tuples of linestring, utilsed to draw the routes on the map"""
     destination = DestLatLng
     Startpoint = StartLatLng
     # Determine which loop Start Station is
@@ -177,7 +183,6 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
     t2 = ox.get_nearest_node(WestLoopG, Startpoint)
     WestStartstation = LRTSelector(WestLoopG, t2, 1)
     EastStartStation = LRTSelector(EastLoopG, t1, 0)
-
     WestD = getClosestStation(WestLoopG, WestStartstation, Startpoint)
     EastD = getClosestStation(EastLoopG, EastStartStation, Startpoint)
     if (WestD > EastD):
@@ -186,6 +191,7 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
     else:
         StartLoopFlag = "West"
         StartStation = WestStartstation
+        
     # Determine which loop Endstation is
     t1 = ox.get_nearest_node(EastLoopG, destination)
     t2 = ox.get_nearest_node(WestLoopG, destination)
@@ -205,6 +211,8 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
         return 0
 
     finalpath = []
+    
+    #This if statement is to check whether startstation and End station is in the same loop therefore requiring no change by the user
     if (StartLoopFlag == LoopFlag or StartStation == 6587709456 or EndStation == 6587709456):
         if (LoopFlag == "East"):
             s = LRTPathFinder(EastLoopG, Startpoint, EndStation)
@@ -214,7 +222,9 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
             s = LRTPathFinder(WestLoopG, Startpoint, EndStation)
             finalpath.append(ox.node_list_to_coordinate_lines(WestLoopG, s))
             return finalpath
+    #If dont exist in same loop of the LRT
     else:
+        #If the start is in the East loop and the end station is in the West loop
         if (LoopFlag == "West" and StartLoopFlag == "East"):
 
             s = LRTPathFinder(EastLoopG, Startpoint, 6587709456)
@@ -225,7 +235,7 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
             s = LRTPathFinder(WestLoopG, TempPoint, EndStation)
             finalpath.append(ox.node_list_to_coordinate_lines(WestLoopG, s))
             return finalpath
-
+        ##If the start is in the West loop and the end station is in the EAST loop
         elif(LoopFlag == "East" and StartLoopFlag == "West"):
 
             s = LRTPathFinder(WestLoopG, Startpoint, 6587709456)

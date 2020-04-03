@@ -5,11 +5,6 @@ import MyQueue
 import math
 
 
-
-#! ---------------------------Functions---------------------------
-
-
-
 def heuristic(G, curnode, endnode):
    return math.sqrt((G.nodes[endnode].get('x') - G.nodes[curnode].get('x')) ** 2 + (G.nodes[endnode].get('y') - G.nodes[curnode].get('y')) ** 2)
 
@@ -57,8 +52,6 @@ def astar(G, startN, endN):
         #? {'osmid': 35091912, 'oneway': True, 'lanes': '2', 'name': 'Punggol Place', 'highway': 'residential', 'maxspeed': '40', 'length': 25.879} 1
         #! ndis is new distance
         for nei, etc in G[curN].items():
-            # TODO print(nei, etc)
-            # TODO print(curN, nei)
             if nei in used:
                 continue
             #! 'length' can be any numeric data in etc
@@ -67,36 +60,6 @@ def astar(G, startN, endN):
             pq.push(f,next(c), nei, ndis, curN)
     return -1
 
-#! ---------------------------Functions---------------------------
-
-
-
-
-
-
-#! ---------------------------Testing---------------------------
-# punggol = (1.4052585, 103.9023302)
-
-# G = ox.graph_from_point(punggol, distance=2500, truncate_by_edge=True)# quick plot
-
-# ox.plot_graph(G, fig_height=10, fig_width=10, edge_color="black")
-
-# test1xy = (1.404062, 103.904901)
-
-# test2xy = (1.393783, 103.91052)
-
-# t1 = ox.get_nearest_node(G, test1xy)
-
-# t2 = ox.get_nearest_node(G, test2xy)
-
-# s = astar(G, t1,t2)
-
-# kk = ox.node_list_to_coordinate_lines(G, s)
-
-# print(kk)
-#! ---------------------------Testing---------------------------s
-
-#! ---------------------------Zen Testing---------------------------
 def routeAstar(start_tuple,end_tuple,G):
 
     # OSMNX nearest NODE COORDS
@@ -107,14 +70,4 @@ def routeAstar(start_tuple,end_tuple,G):
     s = astar(G, start,end);
     coords = ox.node_list_to_coordinate_lines(G, s);
 
-    # output = [];
-    #   print(coords)
-    # Convert into 2d array of lat,lon
-    # for x in range(len(coords)): # Parent Array
-    #     for i in range(len(coords[x])): # Inner Array
-    #         output.append([coords[x][i][1],coords[x][i][0]]);
-
     return coords;
-#! ---------------------------Zen Testing---------------------------
-
-
