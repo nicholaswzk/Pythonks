@@ -64,7 +64,7 @@ Breadth-first Search Algorithm is implemented, it will search in both clockwise 
 ### Algorithm Complexity (Big-O)
 Bus Algorithm: **O(n<sup>2</sup>)**  
   
-Walk Algorithm: **O(<sub>log</sub> |E + V|)**  
+Walk Algorithm: **O(b<sup>d</sup>)**  
   
 LRT: **O(n)**  
 
