@@ -1,11 +1,12 @@
 Home@Punggol
 =======
-<img src="demo.gif" width="600" height="360">
+![](demo.gif)
 ---
+
 Installation Guide
 ------
-**System Requirements:**
-- Python 3.6 and above
+**System Requirements:**  
+- Python 3.6 and above  
 
 
 **PIP install**  
