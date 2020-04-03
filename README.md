@@ -94,12 +94,12 @@ LRT: **O(n)**
 
 ### Contribution
 
-- YEO YUE HENG (1902613) - LRT Algorithm & integration
-- TAN FU WEI (1902130) - Walk Algorithm & integration
-- LEONG ZHI KAI (1902620) - Bus Algorithm & integration
-- WONG ZEN KIT (1902638) - GUI & integration
-- YEO YAO WEI NELSON (1902657) - Research shelter path data
-- WILLIE CHUA (1902647) - Poster and Video 
+- YEO YUE HENG - LRT Algorithm & integration
+- TAN FU WEI - Walk Algorithm & integration
+- LEONG ZHI KAI - Bus Algorithm & integration
+- WONG ZEN KIT - GUI & integration
+- YEO YAO WEI NELSON - Research shelter path data
+- WILLIE CHUA - Poster and Video 
 
 
 
