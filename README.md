@@ -31,13 +31,13 @@ Project outline
 
 This project is created by Singapore Intitsute of Technology's students from Team 3 (Lab group 04).  
 
-The team was tasked to build an application to allow its users to be able to navigate around Punggol District by providing the start and end point with the different types of route optimiztion.
+The team was tasked to build an application to allow its users to be able to navigate around Punggol District by providing the start and end point with the different types of route optimization.
 
 ---
 Outcome
 -----
 
-### Route optimiztion available:
+### Route optimization available:
 - LRT - Take LRT<sup>1</sup>, then directed to take bus<sup>1</sup> and lastly walk towards end destination.
 - Bus - Take bus<sup>1</sup> and walk towards end destination.
 - Walk - Walk towards end destinaton.  
