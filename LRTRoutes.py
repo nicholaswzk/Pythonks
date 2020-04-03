@@ -85,7 +85,6 @@ def LRTSelector(G, EndN, Flag):
     # Get Nearest Station to EndNode
     if (Flag == 0):
         for i in StationsEast:
-            # print(i)
             currStation = getDirectDistance(G, i, EndN)
             if currStation < currentNearestHn:
                 currentNearestHn = currStation
@@ -93,7 +92,6 @@ def LRTSelector(G, EndN, Flag):
         return NearestStation
     else:
         for i in StationWest:
-            # print(i)
             currStation = getDirectDistance(G, i, EndN)
             if currStation < currentNearestHn:
                 currentNearestHn = currStation
@@ -121,19 +119,15 @@ def LRTPathFinder(G, StartPt, EndStation):
 
             firstLoop = True
         else:
-            # print(LRTRoute1)
             for nei, etc in G[LRTRoute1[-1]].items():
                 if(nei not in LRTRoute1):
-                    #print("Appending: ", nei)
                     LRTRoute1.append(nei)
                     if (getDirectDistance(G, EndStation, nei) < 0.05):
-                        # print("Route1")
                         return LRTRoute1
             for i in G[LRTRoute2[-1]]:
                 if (i not in LRTRoute2):
                     LRTRoute2.append(i)
                     if (getDirectDistance(G, EndStation, i) < 0.05):
-                        #print("Route 2")
                         return LRTRoute2
 
 
@@ -162,7 +156,7 @@ def getDistanceKM(start, end):
     a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * \
         math.cos(lat2) * math.sin(dlon / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return R * c  # if less than 0.2 walk
+    return R * c  # if less than 0.2 recommend walk
 
 
 def getClosestStation(G, Node, destination):
@@ -174,19 +168,6 @@ def getClosestStation(G, Node, destination):
 
 
 def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
-    # query_str = '[out:json][timeout:180];(relation["network"="Singapore Rail"]["route"="monorail"](1.39905,103.90891,1.40620,103.92164);>;);out;'
-    # response_json = ox.overpass_request(data={'data': query_str}, timeout=180)
-    # EastLoopG = create_graph(response_json, name='unnamed')
-
-    # query_str = '  [out:json][timeout:180];(relation["network"="Singapore Rail"]["route"="monorail"](1.41195,103.89831,1.41911,103.91103);>;);out;'
-    # response_json = ox.overpass_request(data={'data': query_str}, timeout=180)
-    # WestLoopG = create_graph(response_json, name='unnamed')
-
-    # query_str = '[out:json][timeout:180];(relation["network"="Singapore Rail"]["route"="monorail"](1.4011,103.8977,1.4154,103.9231);>;);out;'
-    # response_json = ox.overpass_request(data={'data': query_str}, timeout=180)
-    # CombinedG = create_graph(response_json, name='unnamed')
-    #ox.plot_graph(CombinedG, fig_height=10, fig_width=10, edge_color="black")
-
     print("LRT START == ", StartLatLng)
     print("LRT END == ", DestLatLng)
     destination = DestLatLng
@@ -196,8 +177,7 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
     t2 = ox.get_nearest_node(WestLoopG, Startpoint)
     WestStartstation = LRTSelector(WestLoopG, t2, 1)
     EastStartStation = LRTSelector(EastLoopG, t1, 0)
-    # print(WestStartstation)
-    # print(EastStartStation)
+
     WestD = getClosestStation(WestLoopG, WestStartstation, Startpoint)
     EastD = getClosestStation(EastLoopG, EastStartStation, Startpoint)
     if (WestD > EastD):
@@ -211,8 +191,7 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
     t2 = ox.get_nearest_node(WestLoopG, destination)
     WestEndStation = LRTSelector(WestLoopG, t2, 1)
     EastEndStation = LRTSelector(EastLoopG, t1, 0)
-    # print(WestEndStation)
-    # print(EastEndStation)
+
     WestD = getClosestStation(WestLoopG, WestEndStation, destination)
     EastD = getClosestStation(EastLoopG, EastEndStation, destination)
     if (WestD > EastD):
@@ -221,75 +200,38 @@ def LRT(EastLoopG, WestLoopG, StartLatLng, DestLatLng):
     else:
         LoopFlag = "West"
         EndStation = WestEndStation
-    #print("EndStation is: ", EndStation)
-    # print(StartLoopFlag)
-    # print(LoopFlag)
+
     if StartStation == EndStation:
         return 0
-        #print("Dont Take LRT Please")
-        # exit()
+
     finalpath = []
     if (StartLoopFlag == LoopFlag or StartStation == 6587709456 or EndStation == 6587709456):
         if (LoopFlag == "East"):
             s = LRTPathFinder(EastLoopG, Startpoint, EndStation)
             finalpath.append(ox.node_list_to_coordinate_lines(EastLoopG, s))
-            # print(finalpath)
-            # ox.plot.plot_graph_route(EastLoopG,finalpath)
             return finalpath
         elif(LoopFlag == "West"):
             s = LRTPathFinder(WestLoopG, Startpoint, EndStation)
             finalpath.append(ox.node_list_to_coordinate_lines(WestLoopG, s))
-            # print(finalpath)
-            # ox.plot.plot_graph_route(WestLoopG,finalpath)
             return finalpath
     else:
         if (LoopFlag == "West" and StartLoopFlag == "East"):
 
             s = LRTPathFinder(EastLoopG, Startpoint, 6587709456)
             finalpath.append(ox.node_list_to_coordinate_lines(EastLoopG, s))
-            #ox.plot.plot_graph_route(EastLoopG, s)
-            # print(finalpath)
 
             TempPoint = (WestLoopG.nodes[6587709457]
                          ['y'], WestLoopG.nodes[6587709457]['x'])
             s = LRTPathFinder(WestLoopG, TempPoint, EndStation)
             finalpath.append(ox.node_list_to_coordinate_lines(WestLoopG, s))
             return finalpath
-            #ox.plot.plot_graph_route(WestLoopG, s)
-            # print(finalpath)
-
-            #ox.plot.plot_graph_route(CombinedG, finalpath)
 
         elif(LoopFlag == "East" and StartLoopFlag == "West"):
 
             s = LRTPathFinder(WestLoopG, Startpoint, 6587709456)
-            #ox.plot.plot_graph_route(WestLoopG, s)
             finalpath.append(ox.node_list_to_coordinate_lines(WestLoopG, s))
-            # print(finalpath)
             TempPoint = (EastLoopG.nodes[6587709456]
                          ['y'], EastLoopG.nodes[6587709456]['x'])
             s = LRTPathFinder(EastLoopG, TempPoint, EndStation)
             finalpath.append(ox.node_list_to_coordinate_lines(EastLoopG, s))
             return finalpath
-            #ox.plot.plot_graph_route(EastLoopG, s)
-            #print (finalpath)
-            #ox.plot.plot_graph_route(CombinedG, finalpath)
-
-    #ConvertedfinalPath = ox.node_list_to_coordinate_lines(CombinedG, finalpath)
-    # return ConvertedfinalPath
-
-# destination = (1.40334935, 103.90963629958)
-# startpoint = (1.4168814, 103.9066298)
-# LRTpath = LRT(EastLoopG,WestLoopG,CombinedG,startpoint,destination)
-# print(LRTpath)
-
-# print(s)
-
-
-#ox.plot_graph(G, fig_height=10, fig_width=10, edge_color="black")
-
-#n, e = ox.graph_to_gdfs(G)
-
-# n.to_csv("LRTNodes.csv")
-
-# e.to_csv("LRTEdges.csv")
